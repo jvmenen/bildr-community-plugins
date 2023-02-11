@@ -92,7 +92,9 @@ class PluginToolBarButton {
         if (!document.getElementById(PluginToolBarButton.pluginsMenuItemDivId)) {
             // init page for smooth sliding in and not seeing the page load
             let bildrPlugins = new BildrPluginsUI();
-            BildrPluginManager.register(bildrPlugins)
+            if (!BildrPluginManager.isRegistered(bildrPlugins.name)) {
+                BildrPluginManager.register(bildrPlugins)
+            }
 
             // CREATE menu bar item
             var elem = document.createElement("div");
@@ -161,8 +163,24 @@ function initializeMutationObservers() {
         if (PluginToolBarButton.isSideBarAvailable()) {
             // stop observing
             me.disconnect();
-
             PluginToolBarButton.create();
+
+            // start observing the removal of PluginToolBarButton.pluginsMenuItemDivId
+            // this happens when switching workspaces in the studio
+            let mut = new MutationObserver((mutationsList, me) => {
+                for (const mutation of mutationsList) {
+                    if (mutation.removedNodes) {
+                        if (document.querySelector(PluginToolBarButton.pluginsMenuItemDivId) == null) {
+                            // stop observing
+                            me.disconnect();
+                            // reinit
+                            initPluginManagerUI();
+                            break;
+                        }
+                    }
+                }
+            });
+            mut.observe(document.querySelector(`.${PluginToolBarButton.sideMenuBarDivCss}`)!, { childList: true });
         }
     }));
     return onStudioLoadObservers;
