@@ -84,7 +84,27 @@ class PluginToolBarButton {
     static pluginsMenuItemDivId = "bildrPluginsMenuItem";
     static sideMenuBarDivCss = "css_23071.css_23052";
 
-    static isSideBarAvailable() {
+    static canAddPluginToBildrUI() {
+        let sideMenuBarExists = PluginToolBarButton.getSideMenuBar() != undefined;
+        let bildrPluginsMenuExists = PluginToolBarButton.getPluginsMenuItemDiv() != undefined;
+
+        return sideMenuBarExists || bildrPluginsMenuExists;
+    }
+
+    private static getPluginsMenuItemDiv() {
+        return document.getElementById("menu-studio-plugins");
+        // let bildrFileMenu = PluginToolBarButton.getFileMenu();
+        // if (bildrFileMenu == undefined) {
+        //     return undefined;
+        // }
+        // return bildrFileMenu.querySelectorAll(".css_as85isPBG0SkEJRIShxQNw.css_kUEA8uIx7UuYseq9vxolhw")[4];
+    }
+
+    private static getFileMenu() {
+        return document.querySelectorAll('.css_moPKBBFqHkuJTheJOhSioQ')[0];
+    }
+
+    static getSideMenuBar() {
         return document.querySelector(`.${PluginToolBarButton.sideMenuBarDivCss}`);
     }
 
@@ -96,30 +116,40 @@ class PluginToolBarButton {
                 BildrPluginManager.register(bildrPlugins)
             }
 
-            // CREATE menu bar item
-            var elem = document.createElement("div");
-            elem.id = PluginToolBarButton.pluginsMenuItemDivId;
-            elem.className = "css_0Bn06MSFX0Oj13pgDAho9g ";
-            elem.innerHTML = "<img src='https://documents-weu.bildr.com/r778fd6080b694ebc8451a3af0b77b028/doc/tool.5hBAqSf0U0aFZAloVaMjBw.svg' class='css_40tBJ8HulEaFxBAoX32hBQ' draggable='false' width='240'><div innerhtml='Community Plugins' class='css_ css_23185 css_22538 css_23641' style='white-space:nowrap;'>Community Plugins</div>";
 
-            // add to side menu bar
-            var sideMenuBar = document.querySelector(`.${PluginToolBarButton.sideMenuBarDivCss}`);
-            if (sideMenuBar == undefined) {
-                throw new Error("Could not find side menu bar");
+            var sideMenuBar = PluginToolBarButton.getSideMenuBar();
+            if (sideMenuBar) {
 
+                // CREATE menu bar item
+                var elem = document.createElement("div");
+                elem.id = PluginToolBarButton.pluginsMenuItemDivId;
+                elem.className = "css_0Bn06MSFX0Oj13pgDAho9g ";
+                elem.innerHTML = "<img src='https://documents-weu.bildr.com/r778fd6080b694ebc8451a3af0b77b028/doc/tool.5hBAqSf0U0aFZAloVaMjBw.svg' class='css_40tBJ8HulEaFxBAoX32hBQ' draggable='false' width='240'><div innerhtml='Community Plugins' class='css_ css_23185 css_22538 css_23641' style='white-space:nowrap;'>Community Plugins</div>";
+
+                // add to side menu bar
+                var sideMenuBar = document.querySelector(`.${PluginToolBarButton.sideMenuBarDivCss}`);
+                if (sideMenuBar == undefined) {
+                    throw new Error("Could not find side menu bar");
+
+                }
+                // after the 5th seperator
+                let seperator = sideMenuBar.querySelectorAll(".css_jMrwOmSGxUezs1sr6VSoNQ  ")[5]
+                if (seperator) {
+                    seperator.before(elem);
+                } else {
+                    sideMenuBar.appendChild(elem);
+                }
             }
-            // after the 5th seperator
-            let seperator = sideMenuBar.querySelectorAll(".css_jMrwOmSGxUezs1sr6VSoNQ  ")[5]
-            if (seperator) {
-                seperator.before(elem);
-            } else {
-                sideMenuBar.appendChild(elem);
+            let bildrPluginsMenu = PluginToolBarButton.getPluginsMenuItemDiv() as HTMLDivElement;
+            if (bildrPluginsMenu) {
+                // enable the plugin menu item
+                PluginToolBarButton.pluginsMenuItemDivId = bildrPluginsMenu.id;
+                bildrPluginsMenu.style.opacity = "1";
             }
 
             // Handle click on button, inside the plugin or outside the plugin (auto hide)
             // Mind the config param capture: true on the addEventListener
             document.body.addEventListener('click', e => {
-
 
                 var target = e.target as HTMLElement;
 
@@ -147,7 +177,29 @@ class PluginToolBarButton {
                 if (action == "hide") {
                     visiblePlugins.forEach(p => p.hide());
                 }
-                if (action == "toggle") { bildrPlugins.toggleVisibility(); }
+                if (action == "toggle") {
+                    bildrPlugins.toggleVisibility();
+
+                    // close Bildr file menu if open
+                    let fileMenu = PluginToolBarButton.getFileMenu();
+                    if (fileMenu) {
+                        let menu = fileMenu.firstChild as HTMLDivElement;
+                        if (!menu.classList.contains("css_0omaFvAC2kelStQ02ZB4AA")) {
+                            menu.classList.add("css_0omaFvAC2kelStQ02ZB4AA");
+                        }
+
+                        // Create a new mouse event of type 'mousedown'
+                        // var evt = new MouseEvent('mousedown', {
+                        //     bubbles: true, // Whether the event should bubble up through the DOM
+                        //     cancelable: true, // Whether the event is cancelable
+                        //     view: window, // The Window object associated with the event
+                        //     button: 2 // The button that was pressed (2 corresponds to the right mouse button)
+                        // });
+
+                        // // Dispatch the event on the document
+                        // document.dispatchEvent(evt);
+                    }
+                }
 
             }, { capture: true })
 
@@ -160,7 +212,7 @@ function initializeMutationObservers() {
     // set up marketplace button as soon as top bar is available
     onStudioLoadObservers.push(new MutationObserver(function (_mutations, me) {
         // `me` is the MutationObserver instance
-        if (PluginToolBarButton.isSideBarAvailable()) {
+        if (PluginToolBarButton.canAddPluginToBildrUI()) {
             // stop observing
             me.disconnect();
             PluginToolBarButton.create();
@@ -192,7 +244,8 @@ function initializeMutationObservers() {
 export function initPluginManagerUI() {
 
     // prevent running this script when not in Bildr Studio
-    if (location.href.indexOf("https://www.bildr.com/studio?projectName=") != -1) {
+    if (location.href.indexOf("https://www.bildr.com/studio?projectName=") != -1 ||
+        location.href.indexOf("https://www.bildrtest.com/studio?projectName=") != -1) {
         // start observing
         var onStudioLoadObservers = initializeMutationObservers();
 

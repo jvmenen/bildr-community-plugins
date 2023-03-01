@@ -1,11 +1,16 @@
 import { BildrPluginRightSide } from "./BildrPluginRightSide";
+//import { PluginToolBarButton } from "./BildrPluginsUI";
 
 /**
  * @public
  */
 export class BildrPluginLeftSide extends BildrPluginRightSide {
+    left: string = '53px';
     constructor(name: string, pageUrl: string) {
         super(name, pageUrl);
+        if (document.getElementById("menu-studio-plugins")) {
+            this.left = '0px';
+        }
     }
 
     public override renderPage(): void {
@@ -23,7 +28,7 @@ export class BildrPluginLeftSide extends BildrPluginRightSide {
             elem.addEventListener('transitionend', _e => {
                 // when the animation is finished, "hide" it when out of view
                 // prevents UI issues when the Studio canvas is scaled
-                if (elem.style.left != '53px') { elem.style.width = '0px'; }
+                if (elem.style.left != this.left) { elem.style.width = '0px'; }
             });
 
             this._divElem = elem;
@@ -35,10 +40,10 @@ export class BildrPluginLeftSide extends BildrPluginRightSide {
 
     public override show() {
         this._divElem.style.width = '350px';
-        this._divElem.style.left = '53px';
+        this._divElem.style.left = this.left;
     }
 
     public override get isVisible() {
-        return this._divElem.style.left == '53px';
+        return this._divElem.style.left == this.left;
     }
 }
