@@ -145,6 +145,16 @@ class PluginToolBarButton {
                 // enable the plugin menu item
                 PluginToolBarButton.pluginsMenuItemDivId = bildrPluginsMenu.id;
                 bildrPluginsMenu.style.opacity = "1";
+                let bildrPluginsMenuObj = (bildrPluginsMenu as unknown as { brwObj: any }).brwObj;
+                let evMouseEnter = bildrPluginsMenuObj.evs.mouseenter;
+
+                addEventHandlers(bildrPluginsMenuObj, bildrPluginsMenu, [{
+                    "eventID": 0,
+                    "code": "click",
+                    "actID": "89QiHjCXJ0i3MZiFFvC8vA"
+                },
+                    evMouseEnter
+                ])
             }
 
             // Handle click on button, inside the plugin or outside the plugin (auto hide)
@@ -179,26 +189,6 @@ class PluginToolBarButton {
                 }
                 if (action == "toggle") {
                     bildrPlugins.toggleVisibility();
-
-                    // close Bildr file menu if open
-                    let fileMenu = PluginToolBarButton.getFileMenu();
-                    if (fileMenu) {
-                        let menu = fileMenu.firstChild as HTMLDivElement;
-                        if (!menu.classList.contains("css_0omaFvAC2kelStQ02ZB4AA")) {
-                            menu.classList.add("css_0omaFvAC2kelStQ02ZB4AA");
-                        }
-
-                        // Create a new mouse event of type 'mousedown'
-                        // var evt = new MouseEvent('mousedown', {
-                        //     bubbles: true, // Whether the event should bubble up through the DOM
-                        //     cancelable: true, // Whether the event is cancelable
-                        //     view: window, // The Window object associated with the event
-                        //     button: 2 // The button that was pressed (2 corresponds to the right mouse button)
-                        // });
-
-                        // // Dispatch the event on the document
-                        // document.dispatchEvent(evt);
-                    }
                 }
 
             }, { capture: true })
