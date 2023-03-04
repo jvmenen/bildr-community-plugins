@@ -59,15 +59,17 @@ export class BildrPluginManager {
     }
 
     private triggerActionInPlugin(e: any) {
-        if (!e.data && !e.detail) throw new Error("e.data or e.detail property is missing.");
-
+        // is it a Bildr message?
+        if (!e.data && !e.detail) return;
         let dataJson = (e.data ? e.data : e.detail) as BildrPluginData;
+        if (!dataJson.uMsgId) return;
+
+        // does it have the required properties?
         if (!dataJson.pluginName) throw new Error("Required property e.data.pluginName is missing.");
         if (!dataJson.command) throw new Error("Required property e.data.command is missing.");
         if (!dataJson.uMsgId) throw new Error("Required property e.data.uMsgId is missing.");
 
         let plugin = this._registeredPlugins.find(item => dataJson.pluginName && item.name == dataJson.pluginName);
-
         if (plugin == undefined) {
             throw new Error(`Plugin with name '${dataJson.pluginName}' is not registered.`);
         };
