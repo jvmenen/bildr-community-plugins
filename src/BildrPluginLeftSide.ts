@@ -19,7 +19,7 @@ export class BildrPluginLeftSide extends BildrPluginRightSide {
             let elem = this.document.createElement('div');
             elem.id = this._divId;
             elem.setAttribute('name', this._name);
-            elem.style.cssText = "width:0px;height:100vh;top:0px;left:-350px;right:unset;bottom:unset;border:none;background:#ffffff;position: fixed;z-index: 100004;overflow: hidden;position:absolute;transition: left 300ms ease-in-out 0s;";
+            elem.style.cssText = "width:0px;height:100vh;top:48px;left:-350px;right:unset;bottom:unset;border:none;background:#ffffff;position: fixed;z-index: 100004;overflow: hidden;position:absolute;transition: left 300ms ease-in-out 0s;";
             elem.innerHTML = `<iframe id='${this._frameId}' src='${this.pageUrl}' style='all:unset;width:100%;height:100%';background-color:#292c33></iframe>`;
             // add to document (right side)
             this.document.body.appendChild(elem);
