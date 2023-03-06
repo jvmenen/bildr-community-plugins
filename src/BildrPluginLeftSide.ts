@@ -1,16 +1,12 @@
 import { BildrPluginRightSide } from "./BildrPluginRightSide";
-//import { PluginToolBarButton } from "./BildrPluginsUI";
 
 /**
  * @public
  */
 export class BildrPluginLeftSide extends BildrPluginRightSide {
-    left: string = '53px';
+    left: string = '0px';
     constructor(name: string, pageUrl: string) {
         super(name, pageUrl);
-        if (document.getElementById("menu-studio-plugins")) {
-            this.left = '0px';
-        }
     }
 
     public override renderPage(): void {

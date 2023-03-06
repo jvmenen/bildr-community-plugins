@@ -93,11 +93,6 @@ class PluginToolBarButton {
 
     private static getPluginsMenuItemDiv() {
         return document.getElementById("menu-studio-plugins");
-        // let bildrFileMenu = PluginToolBarButton.getFileMenu();
-        // if (bildrFileMenu == undefined) {
-        //     return undefined;
-        // }
-        // return bildrFileMenu.querySelectorAll(".css_as85isPBG0SkEJRIShxQNw.css_kUEA8uIx7UuYseq9vxolhw")[4];
     }
 
     private static getFileMenu() {
@@ -116,30 +111,7 @@ class PluginToolBarButton {
                 BildrPluginManager.register(bildrPlugins)
             }
 
-
-            var sideMenuBar = PluginToolBarButton.getSideMenuBar();
-            if (sideMenuBar) {
-
-                // CREATE menu bar item
-                var elem = document.createElement("div");
-                elem.id = PluginToolBarButton.pluginsMenuItemDivId;
-                elem.className = "css_0Bn06MSFX0Oj13pgDAho9g ";
-                elem.innerHTML = "<img src='https://documents-weu.bildr.com/r778fd6080b694ebc8451a3af0b77b028/doc/tool.5hBAqSf0U0aFZAloVaMjBw.svg' class='css_40tBJ8HulEaFxBAoX32hBQ' draggable='false' width='240'><div innerhtml='Community Plugins' class='css_ css_23185 css_22538 css_23641' style='white-space:nowrap;'>Community Plugins</div>";
-
-                // add to side menu bar
-                var sideMenuBar = document.querySelector(`.${PluginToolBarButton.sideMenuBarDivCss}`);
-                if (sideMenuBar == undefined) {
-                    throw new Error("Could not find side menu bar");
-
-                }
-                // after the 5th seperator
-                let seperator = sideMenuBar.querySelectorAll(".css_jMrwOmSGxUezs1sr6VSoNQ  ")[5]
-                if (seperator) {
-                    seperator.before(elem);
-                } else {
-                    sideMenuBar.appendChild(elem);
-                }
-            }
+            // add the plugin menu item
             let bildrPluginsMenu = PluginToolBarButton.getPluginsMenuItemDiv() as HTMLDivElement;
             if (bildrPluginsMenu) {
                 // enable the plugin menu item
@@ -206,23 +178,6 @@ function initializeMutationObservers() {
             // stop observing
             me.disconnect();
             PluginToolBarButton.create();
-
-            // start observing the removal of PluginToolBarButton.pluginsMenuItemDivId
-            // this happens when switching workspaces in the studio
-            let mut = new MutationObserver((mutationsList, me) => {
-                for (const mutation of mutationsList) {
-                    if (mutation.removedNodes) {
-                        if (document.querySelector(PluginToolBarButton.pluginsMenuItemDivId) == null) {
-                            // stop observing
-                            me.disconnect();
-                            // reinit
-                            initPluginManagerUI();
-                            break;
-                        }
-                    }
-                }
-            });
-            mut.observe(document.querySelector(`.${PluginToolBarButton.sideMenuBarDivCss}`)!, { childList: true });
         }
     }));
     return onStudioLoadObservers;
